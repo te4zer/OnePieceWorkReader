@@ -131,6 +131,7 @@
         let chapter = 1067;
         let secondary = 1260;
         let pageIndex = 1;
+		let comp = 0;
 		var widePage = false;
 		var nextIsWide = false;
 		var prevIsWide = false;
@@ -197,7 +198,10 @@
             var image1 = document.getElementById('image1');
             var image2 = document.getElementById('image2');
             var pageDisplay = document.getElementById('pageDisplay');
-            var baseUrl = `https://onepiece-tube.translate.goog/upload/manga/kapitel/${chapter}-${secondary}/`;
+			secondary = (chapter>= 1095 && (secondary-chapter)<194) ? chapter+194 : secondary;
+			var baseUrl = `https://onepiece-tube.translate.goog/upload/manga/kapitel/${chapter}-${secondary}/`;
+			//console.log(`Current Chapter is  ${chapter}  while End is  ${secondary} Diff is ${secondary-chapter}`);
+			
 
 			image1.onload = () => {
 				widePage = (image1.naturalWidth > image1.naturalHeight) ? true : false;
@@ -230,7 +234,6 @@
 			}
 			
 			prevImage.onload = () => {
-			
 				 prevIsWide = (prevImage.naturalWidth > prevImage.naturalHeight) ? true : false; 
 				
 			}
@@ -239,7 +242,7 @@
             image1.src = `${baseUrl}${pad(pageIndex)}.png`;
             image2.src = `${baseUrl}${pad(pageIndex + 1)}.png`;
 						
-			prevImage.src = `${baseUrl}${pad(pageIndex-1)}.png`;
+			prevImage.src = (pageIndex != 1) ? `${baseUrl}${pad(pageIndex-1)}.png`:"";
 			(widePage || pageIndex === 1)? nextImage.src = `${baseUrl}${pad(pageIndex+1)}.png`: nextImage.src = `${baseUrl}${pad(pageIndex+2)}.png`;
 			
         }
