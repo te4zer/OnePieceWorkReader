@@ -1,0 +1,250 @@
+<!-- <a href="https://translate.google.com/?sl=auto&tl=de&text=onepiece.tube/manga/kapitel/1071/2">Fehlersuche</a> -->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Piece Manga Reader</title>
+    <style>
+	*, button {
+		background-color: #111;
+		color: #ffffff;
+		font-family: Avenir Next LT Pro Demi, sans-serif;
+		font-size: 11pt;
+	}
+	body {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		margin: 0;
+	}
+	#header {
+		display: flex;
+		justify-content: space-between;
+		width: 99vw;
+		background-color: #333;
+	}
+	#header input {
+		background: #fff;
+		color: black;
+		width: 80px;
+		text-align: center;
+	}
+	input::-webkit-inner-spin-button {
+		opacity: 1;
+	}
+	#header span, #footer span,
+	.nav-button {
+		background-color: #333;
+		color: #fff;
+		border: none;
+		cursor: pointer;
+		padding: 10px;
+	}
+	.nav-button:hover {
+		background-color: #555;
+	}
+	.main {
+		display: flex;
+		align-items: flex-start;
+		width: 99vw;
+		justify-content: space-between;
+	}
+	.manga-container {
+		display: flex;
+		justify-content: center;
+		flex-wrap: nowrap;
+		height: 90vh;
+		overflow: hidden;
+		width: 100%;
+	}
+	.left {
+		justify-content: flex-end;
+	}
+	.right {
+		justify-content: flex-start;
+	}	
+	
+	.left,
+	.right {
+		flex: 1 1 auto;
+		display: flex;
+		align-items: flex-start;
+	}
+	.manga-container img {
+		max-height: 89vh;
+		margin: 5px;
+		object-fit: contain;
+	}
+	#footer {
+		width: 99vw;
+		background-color: #333;
+		text-align: center;
+		padding: 10px 0;
+		bottom: 0;
+	}
+	.zoomed img {
+		max-height: none !important;
+		margin-top: 5px;
+	}
+	.zoomed {
+		overflow-y: auto !important;
+	}
+
+		
+    </style>
+</head>
+<body>
+    <div id="header">
+        <div class="nav-button" onclick="changeChapter(-1)">&laquo; Kapitel Zurück</div>
+        <div onclick="previousPage()" class="nav-button">&larr; Vorherige</div>
+		<span>
+            Kapitel:
+            <input type="number" id="chapterInput" value="1067" onchange="manualChangeChapter()" min="1">
+        </span>
+		<div onclick="nextPage()" class="nav-button">Nächste &rarr;</div>
+        <div class="nav-button" onclick="changeChapter(1)">Kapitel Vor &raquo;</div>
+    </div>
+    <div class="main" onclick="toggleZoom ()">
+        
+        <div class="manga-container">
+			<div class="left">
+				<img id="image1" src="" alt="Manga Bild 1">
+			</div>
+            <div class="right">
+				<img id="image2" src="" alt="Manga Bild 2">
+			</div>
+        </div>
+        
+    </div>
+    <div id="footer"><span style="margin: 0 8vw"><b style="background-color:transparent;">OnePiece WORK Manga Reader</b> -  running Google Proxy</span>
+				Seiten: <span id="pageDisplay">1</span>
+				<span style="margin: 0 16vw">Click Page for Zoom</span>
+	</div>
+	<div style="display:none;"><img id="prevImg"src=""><img id="nextImg" src=""></div>
+    <script>
+		function toggleZoom() {
+			const container = document.querySelector('.manga-container');
+			container.classList.toggle('zoomed');
+		}
+		
+        let chapter = 1067;
+        let secondary = 1260;
+        let pageIndex = 1;
+		var widePage = false;
+		var nextIsWide = false;
+		var prevIsWide = false;
+		var prevImage = document.getElementById('prevImg');
+		var nextImage = document.getElementById('nextImg');
+		
+		// ADD Error Listener
+		const images = document.querySelectorAll('img');
+		images.forEach((img, index) => {
+			
+			img.onerror = function() { 
+				setTimeout(() => { 
+					if (!img.complete || img.naturalWidth === 0) {
+						//img.onerror = null; // Verhindern Sie eine rekursive Schleife 
+						(img.src.indexOf('png') >= 0) ? img.src = img.src.replace(/\.png$/, '.jpg') : img.src = img.src.replace(/\.jpg$/, '.png');
+						} 
+					}, 200); // Verzögerung von 250 Millisekunden }; });
+				};
+			}); // End For Each
+		
+		// FUNCTIONS
+        function pad(number) {
+            return number.toString().padStart(2, '0');
+        }
+
+        function previousPage() {
+            if (pageIndex > 2 && !prevIsWide) {
+				pageIndex -= 2;
+            }else {
+				pageIndex > 1 ? pageIndex -= 1 : '';
+			}
+			updateImages();
+        }
+
+        function nextPage() {
+			if(nextImage.naturalHeight != 0) { //valid or End
+				if (pageIndex == 1 || widePage ) {
+					pageIndex += 1;
+				} else {
+					pageIndex += 2;
+				}
+				updateImages();
+			} 
+        }
+
+        function changeChapter(offset) {
+            chapter += offset;
+            secondary += offset;
+            pageIndex = 1;
+            updateImages();
+        }
+
+        function manualChangeChapter() {
+            const chapterInput = document.getElementById('chapterInput').value;
+            chapter = parseInt(chapterInput);
+            secondary = chapter + 193;
+            pageIndex = 1;
+            updateImages();
+        }
+		
+		function updateImages() {
+			// Basics laden
+            document.getElementById('chapterInput').value = chapter;
+            var image1 = document.getElementById('image1');
+            var image2 = document.getElementById('image2');
+            var pageDisplay = document.getElementById('pageDisplay');
+            var baseUrl = `https://onepiece-tube.translate.goog/upload/manga/kapitel/${chapter}-${secondary}/`;
+
+			image1.onload = () => {
+				widePage = (image1.naturalWidth > image1.naturalHeight) ? true : false;
+				if (widePage || pageIndex === 1) {
+                    image1.style.maxWidth = '98vw';
+					image2.style.display = 'none';
+					document.querySelector('style').innerText = document.querySelector('style').innerText.replace('flex: 1;', 'flex: 0;')
+				} else {
+					image1.style.maxWidth = '48vw';
+					image2.style.maxWidth = '48vw';
+                    image2.style.display = 'block';
+					document.querySelector('style').innerText = document.querySelector('style').innerText.replace('flex: 1;', 'flex: 0;')
+                }
+				pageDisplay.innerText = (widePage || pageIndex === 1) ? `${pageIndex}` : `${pageIndex}, ${pageIndex + 1}`;
+            };
+			
+            image2.onload = () => {
+                secondWide = (image2.naturalWidth > image2.naturalHeight) ? true : false;
+                if (secondWide) {
+					image2.style.display = 'none';
+					widePage = true;
+					pageDisplay.innerText = (widePage || pageIndex === 1) ? `${pageIndex}` : `${pageIndex}, ${pageIndex + 1}`;
+				}
+            };
+			
+			nextImage.onload = () => {
+			
+				nextIsWide = (nextImage.naturalWidth > nextImage.naturalHeight) ?  true : false;
+				
+			}
+			
+			prevImage.onload = () => {
+			
+				 prevIsWide = (prevImage.naturalWidth > prevImage.naturalHeight) ? true : false; 
+				
+			}
+			
+			// Bilder mit PageIndex i, i+2 laden
+            image1.src = `${baseUrl}${pad(pageIndex)}.png`;
+            image2.src = `${baseUrl}${pad(pageIndex + 1)}.png`;
+						
+			prevImage.src = `${baseUrl}${pad(pageIndex-1)}.png`;
+			(widePage || pageIndex === 1)? nextImage.src = `${baseUrl}${pad(pageIndex+1)}.png`: nextImage.src = `${baseUrl}${pad(pageIndex+2)}.png`;
+			
+        }
+		
+		updateImages();
+    </script>
+</body>
+</html>
