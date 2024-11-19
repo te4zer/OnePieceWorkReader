@@ -1,5 +1,5 @@
 <h1> One Piece Manga Work Reader </h1>
-<h2>Der Reader ermöglicht die Verwendung auf der Arbeit in regulierten Netzwerken, indem translate.google.com als proxy verwendet wird.</h2>
+<h2>Der Reader ermöglicht die Verwendung auf der Arbeit in regulierten Netzwerken, durch die Vewendung von translate.google.com als Proxy.</h2>
 Die Verarbeitung der Bilder und links geschieht über reinen Javascript Code offline auf dem PC. Onepiece.tube wird ausschließlich über google adressiert. Dadurch sieht es für Netzwerkdaten so aus, als würde google besucht oder gesucht werden. Darüber hinaus können übliche requests vom Browser auftreten, die je nach Benutzer, Installation, Version und Erweiterungen variieren können.
 
 Grundlegende Funktionen:
