@@ -102,7 +102,6 @@
             Kapitel:
             <input type="number" id="chapterInput" value="1067" onchange="manualChangeChapter()" min="1">
         </span>
-	    <span>images by OnePiece[dot]tube</span>
 		<div onclick="nextPage()" class="nav-button">Nächste &rarr;</div>
         <div class="nav-button" onclick="changeChapter(1)">Kapitel Vor &raquo;</div>
     </div>
@@ -124,20 +123,19 @@
 	</div>
 	<div style="display:none;"><img id="prevImg"src=""><img id="nextImg" src=""></div>
     <script>
-		function toggleZoom() {
-			const container = document.querySelector('.manga-container');
-			container.classList.toggle('zoomed');
-		}
-		
         let chapter = 1067;
-        let secondary = 1260;
         let pageIndex = 1;
-		let comp = 0;
 		var widePage = false;
 		var nextIsWide = false;
 		var prevIsWide = false;
 		var prevImage = document.getElementById('prevImg');
 		var nextImage = document.getElementById('nextImg');
+		const baseUrl = `https://onepiece-tube.translate.goog/upload/manga/kapitel/`;
+		
+		function toggleZoom() {
+			const container = document.querySelector('.manga-container');
+			container.classList.toggle('zoomed');
+		}
 		
 		// ADD Error Listener
 		const images = document.querySelectorAll('img');
@@ -147,13 +145,49 @@
 				setTimeout(() => { 
 					if (!img.complete || img.naturalWidth === 0) {
 						//img.onerror = null; // Verhindern Sie eine rekursive Schleife 
-						(img.src.indexOf('png') >= 0) ? img.src = img.src.replace(/\.png$/, '.jpg') : img.src = img.src.replace(/\.jpg$/, '.png');
+						(img.src.indexOf('png') >= 0) ? img.src = img.src.replace(/\.png$/, '.jpg') : (img.src.indexOf('jpg') >= 0) ? img.src = img.src.replace(/\.jpg$/, '.jpeg') : img.src = img.src.replace(/\.jpeg$/, '.png');
 						} 
 					}, 200); // Verzögerung von 250 Millisekunden }; });
 				};
 			}); // End For Each
 		
 		// FUNCTIONS
+		
+		function getUrl(chapter){	
+				let sec;
+				let lead = "";
+				let clead = "";
+				switch (true) {
+					case (chapter >= 1095):
+						sec = chapter + 194;
+						break;
+					case (chapter >= 1004):
+						sec = chapter + 193;
+						break;
+					case (chapter == 1003):
+						sec = chapter + 192;
+						lead = "0";
+						break;
+					case (chapter == 1002):
+						sec = chapter + 191;
+						lead = "0";
+						break;
+					case (chapter == 1001):
+						sec = 1;
+						lead = "0";
+						break;
+					case (chapter == 1000):
+						sec = chapter + 3; 
+						break;
+					case (chapter > 0 && chapter <= 1000):
+						clead = "0";
+						sec = chapter + 3; 
+						break;
+				}
+				return `${baseUrl}${clead}${chapter}-${sec}/${lead}`;
+		}
+		
+		
         function pad(number) {
             return number.toString().padStart(2, '0');
         }
@@ -180,7 +214,6 @@
 
         function changeChapter(offset) {
             chapter += offset;
-            secondary += offset;
             pageIndex = 1;
             updateImages();
         }
@@ -188,21 +221,16 @@
         function manualChangeChapter() {
             const chapterInput = document.getElementById('chapterInput').value;
             chapter = parseInt(chapterInput);
-            secondary = chapter + 193;
             pageIndex = 1;
             updateImages();
         }
-		
+
 		function updateImages() {
 			// Basics laden
             document.getElementById('chapterInput').value = chapter;
             var image1 = document.getElementById('image1');
             var image2 = document.getElementById('image2');
             var pageDisplay = document.getElementById('pageDisplay');
-			secondary = (chapter>= 1095 && (secondary-chapter)<194) ? chapter+194 : secondary;
-			var baseUrl = `https://onepiece-tube.translate.goog/upload/manga/kapitel/${chapter}-${secondary}/`;
-			//console.log(`Current Chapter is  ${chapter}  while End is  ${secondary} Diff is ${secondary-chapter}`);
-			
 
 			image1.onload = () => {
 				widePage = (image1.naturalWidth > image1.naturalHeight) ? true : false;
@@ -229,22 +257,19 @@
             };
 			
 			nextImage.onload = () => {
-			
 				nextIsWide = (nextImage.naturalWidth > nextImage.naturalHeight) ?  true : false;
-				
 			}
 			
 			prevImage.onload = () => {
 				 prevIsWide = (prevImage.naturalWidth > prevImage.naturalHeight) ? true : false; 
-				
 			}
 			
-			// Bilder mit PageIndex i, i+2 laden
-            image1.src = `${baseUrl}${pad(pageIndex)}.png`;
-            image2.src = `${baseUrl}${pad(pageIndex + 1)}.png`;
+			url = getUrl(chapter);
+            image1.src = `${url}${pad(pageIndex)}.png`;
+            image2.src = `${url}${pad(pageIndex + 1)}.png`;
 						
-			prevImage.src = (pageIndex != 1) ? `${baseUrl}${pad(pageIndex-1)}.png`:"";
-			(widePage || pageIndex === 1)? nextImage.src = `${baseUrl}${pad(pageIndex+1)}.png`: nextImage.src = `${baseUrl}${pad(pageIndex+2)}.png`;
+			prevImage.src = (pageIndex != 1) ? `${url}${pad(pageIndex-1)}.png`:"";
+			(widePage || pageIndex === 1)? nextImage.src = `${url}${pad(pageIndex+1)}.png`: nextImage.src = `${url}${pad(pageIndex+2)}.png`;
 			
         }
 		
